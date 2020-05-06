@@ -1,4 +1,4 @@
-import { CREATE_ROOM, JOIN_ROOM } from "./types";
+import { CREATE_ROOM, JOIN_ROOM, AVAILABLE_ROOMS } from "./types";
 import axios from "axios";
 
 const baseURL =
@@ -34,6 +34,20 @@ export const getToken = (sessionId) => (dispatch) => {
     });
 };
 
+export const getAvailableRooms = () => (dispatch) => {
+  return axios
+    .get(`${baseURL}/api/session`)
+    .then((response) => {
+      dispatch({
+        type: AVAILABLE_ROOMS,
+        payload: response.data,
+      });
+    })
+    .catch((error) => {
+      return error.response;
+    });
+};
+
 const userInitialState = {
   data: [],
   createdRoom: {
@@ -56,6 +70,11 @@ export const reducer = (state = userInitialState, action) => {
       return {
         ...state,
         userToken: action.payload,
+      };
+    case AVAILABLE_ROOMS:
+      return {
+        ...state,
+        availableRooms: action.payload,
       };
     default:
       return state;

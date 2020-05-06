@@ -7,7 +7,7 @@ import "./App.css";
 import { connect } from "react-redux";
 
 // thunks
-import { getSessionInfo } from "../store/rooms";
+import { getSessionInfo, getAvailableRooms } from "../store/rooms";
 
 // components
 import Room from '../components/room';
@@ -72,7 +72,7 @@ class App extends Component {
     return (
       <div className="MainWindow">
         <button onClick={this.props.getSessionInfo}>Create a room</button>
-        <button>Rooms</button>
+        <button onClick={this.props.getAvailableRooms}>Rooms</button>
       </div>
     );
   };
@@ -91,10 +91,12 @@ class App extends Component {
 
 export const mapStateToProps = (state) => ({
   createdRoom: state.rooms.createdRoom,
+  availableRooms: state.rooms.availableRooms,
 });
 
 export const mapDispatchToProps = (dispatch) => ({
   getSessionInfo: () => dispatch(getSessionInfo()),
+  getAvailableRooms: () => dispatch(getAvailableRooms()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);
