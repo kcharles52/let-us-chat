@@ -9,15 +9,18 @@ import { connect } from "react-redux";
 // thunks
 import { getSessionInfo } from "../store/rooms";
 
+// components
+import Room from '../components/room';
+
 class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      openedRoom: {
+      room: {
         roomId: "",
         opened: false,
       },
-      createdRoom: null
+      createdRoom: null,
     };
   }
 
@@ -34,20 +37,41 @@ class App extends Component {
     });
   }
 
+  componentDidUpdate(prevProps) {
+    const { sessionId } = this.props.createdRoom;
+    if (sessionId !== prevProps.createdRoom.sessionId) {
+      this.enterRoom(sessionId);
+    }
+  }
+
+  enterRoom = (roomId) => {
+    this.setState((prevState) => {
+      return {
+        ...prevState,
+        room: {
+          roomId,
+          opened: true,
+        },
+      };
+    });
+  };
+
   renderMainWindow = () => {
     return (
       <div className="MainWindow">
         <button onClick={this.props.getSessionInfo}>Create a room</button>
-        <button >Rooms</button>
+        <button>Rooms</button>
       </div>
     );
   };
 
   render() {
+    const { room } = this.state
     return (
       <Container fluid>
         <h1>Let's Chat</h1>
-        {this.renderMainWindow()}
+        {!room.opened && this.renderMainWindow()}
+        {room.opened && <Room roomId={room.roomId} />}
       </Container>
     );
   }

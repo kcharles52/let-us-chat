@@ -1,7 +1,10 @@
 import { CREATE_ROOM, JOIN_ROOM } from "./types";
 import axios from "axios";
 
-const baseURL = process.env.NODE_ENV==="development" ? "http://localhost:5000" : window.location.origin;
+const baseURL =
+  process.env.NODE_ENV === "development"
+    ? "http://localhost:5000"
+    : window.location.origin;
 
 export const getSessionInfo = () => (dispatch) => {
   axios
@@ -17,16 +20,29 @@ export const getSessionInfo = () => (dispatch) => {
     });
 };
 
+export const getToken = (sessionId) => (dispatch) => {
+  return axios
+    .post(`${baseURL}/api/token`, { sessionId })
+    .then((response) => {
+      dispatch({
+        type: JOIN_ROOM,
+        payload: response.data,
+      });
+    })
+    .catch((error) => {
+      return error.response;
+    });
+};
 
 const userInitialState = {
   data: [],
   createdRoom: {
-    apiKey:'',
-    sessionId:'',
-    token:''
+    apiKey: "",
+    sessionId: "",
+    token: "",
   },
   availableRooms: [],
-  userToken: ''
+  userToken: "",
 };
 
 export const reducer = (state = userInitialState, action) => {
@@ -38,7 +54,8 @@ export const reducer = (state = userInitialState, action) => {
       };
     case JOIN_ROOM:
       return {
-        ...state
+        ...state,
+        userToken: action.payload,
       };
     default:
       return state;
