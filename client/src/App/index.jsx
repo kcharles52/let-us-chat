@@ -7,7 +7,7 @@ import "./App.css";
 import { connect } from "react-redux";
 
 // thunks
-import { getSessionInfo } from "../store/modules/rooms";
+import { getSessionInfo } from "../store/rooms";
 
 class App extends Component {
   constructor(props) {
@@ -34,12 +34,6 @@ class App extends Component {
     });
   }
 
-  componentDidUpdate(prevProps) {
-    if (this.props.createdRoom.sessionId !== prevProps.createdRoom.sessionId) {
-      this.enterRoom(this.props.createdRoom.sessionId);
-    }
-  }
-
   renderMainWindow = () => {
     return (
       <div className="MainWindow">
@@ -60,7 +54,7 @@ class App extends Component {
 }
 
 export const mapStateToProps = (state) => ({
-  createdRoom: state.request.createdRoom,
+  createdRoom: state.rooms.createdRoom,
 });
 
 export const mapDispatchToProps = (dispatch) => ({

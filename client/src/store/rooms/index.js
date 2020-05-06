@@ -1,4 +1,4 @@
-import { CREATE_ROOM } from "./types";
+import { CREATE_ROOM, JOIN_ROOM } from "./types";
 import axios from "axios";
 
 const baseURL = process.env.NODE_ENV==="development" ? "http://localhost:5000" : window.location.origin;
