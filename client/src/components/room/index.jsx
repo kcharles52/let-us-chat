@@ -26,7 +26,7 @@ class Room extends React.Component {
     roomUsers: [],
     roomId: "",
     session: null,
-    publishers: [],
+    publisher: null,
   };
   state = {
     ...this.initialState,
@@ -128,7 +128,7 @@ class Room extends React.Component {
           return;
         }
         const userId = session.connection.id;
-        
+
         this.addRoomUser(userId);
 
         const publisher = OT.initPublisher(
@@ -145,11 +145,57 @@ class Room extends React.Component {
         this.setState((prevState) => {
           return {
             ...prevState,
-              session,
-              publishers: [...prevState.publishers, publisher],
+            session,
+            publisher,
           };
         });
       }
+    });
+  };
+
+  leaveRoom = () => {
+    const { session, publisher } = this.state;
+    session.unpublish(publisher);
+    session.disconnect();
+  };
+
+  toggleAudio = () => {
+    this.setState(
+      (prevState) => {
+        return {
+          ...prevState,
+          publishAudio: !prevState.publishAudio,
+        };
+      },
+      () => {
+        const { publisher, publishAudio } = this.state;
+        publisher.publishAudio(publishAudio);
+      }
+    );
+  };
+
+  toggleVideo = () => {
+    this.setState(
+      (prevState) => {
+        return {
+          ...prevState,
+          publishVideo: !prevState.publishVideo,
+        };
+      },
+      () => {
+        const { publisher, publishVideo } = this.state;
+
+        publisher.publishVideo(publishVideo);
+      }
+    );
+  };
+
+  showRoomChat = () => {
+    this.setState((prevState) => {
+      return {
+        ...prevState,
+        showChat: !prevState.showChat,
+      };
     });
   };
 
@@ -161,6 +207,13 @@ class Room extends React.Component {
             <Row id="people">{this.usersInARoom()}</Row>
           </Row>
         </div>
+        <UserControls
+          leaveRoom={this.leaveRoom}
+          toggleVideo={this.toggleVideo}
+          toggleAudio={this.toggleAudio}
+          shareScreen={this.shareScreen}
+          chat={this.showRoomChat}
+        />
       </Container>
     );
   }
