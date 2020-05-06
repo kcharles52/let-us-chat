@@ -10,7 +10,7 @@ import { connect } from "react-redux";
 import { getSessionInfo, getAvailableRooms, deleteRoom } from "../store/rooms";
 
 // components
-import Room from '../components/room';
+import Room from "../components/room";
 
 class App extends Component {
   constructor(props) {
@@ -22,6 +22,7 @@ class App extends Component {
         opened: false,
       },
       createdRoom: null,
+      showAvailableRooms: false,
     };
   }
 
@@ -38,10 +39,19 @@ class App extends Component {
     });
   }
 
-  componentDidUpdate(prevProps) {
+  componentDidUpdate(prevProps, prevState) {
     const { sessionId } = this.props.createdRoom;
     if (sessionId !== prevProps.createdRoom.sessionId) {
       this.enterRoom(sessionId);
+    }
+
+    if (this.props.availableRooms !== prevState.rooms) {
+      this.setState((prevState) => {
+        return {
+          ...prevState,
+          rooms: this.props.availableRooms,
+        };
+      });
     }
   }
 
@@ -67,10 +77,10 @@ class App extends Component {
         },
       };
     });
-  }
+  };
 
   showAvailableRooms = () => {
-    const { rooms } = this.state;
+    const { rooms } = this.state.rooms;
     const availableRooms = [];
 
     if (rooms) {
@@ -112,19 +122,21 @@ class App extends Component {
     return (
       <div className="MainWindow">
         <button onClick={this.props.getSessionInfo}>Create a room</button>
-        <button onClick={this.props.getAvailableRooms}>Rooms</button>
+        <button onClick={this.showsRooms}>Rooms</button>
         <div>{this.state.showAvailableRooms && this.showAvailableRooms()}</div>
       </div>
     );
   };
 
   render() {
-    const { room } = this.state
+    const { room } = this.state;
     return (
       <Container fluid>
         <h1>Let's Chat</h1>
         {!room.opened && this.renderMainWindow()}
-        {room.opened && <Room roomId={room.roomId} closeRoom={this.closeRoom} />}
+        {room.opened && (
+          <Room roomId={room.roomId} closeRoom={this.closeRoom} />
+        )}
       </Container>
     );
   }
