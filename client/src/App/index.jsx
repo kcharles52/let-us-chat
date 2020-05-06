@@ -56,6 +56,18 @@ class App extends Component {
     });
   };
 
+  closeRoom = () => {
+    this.setState((prevState) => {
+      return {
+        ...prevState,
+        room: {
+          roomId: "",
+          opened: false,
+        },
+      };
+    });
+  }
+
   renderMainWindow = () => {
     return (
       <div className="MainWindow">
@@ -71,7 +83,7 @@ class App extends Component {
       <Container fluid>
         <h1>Let's Chat</h1>
         {!room.opened && this.renderMainWindow()}
-        {room.opened && <Room roomId={room.roomId} />}
+        {room.opened && <Room roomId={room.roomId} closeRoom={this.closeRoom} />}
       </Container>
     );
   }

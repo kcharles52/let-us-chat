@@ -27,7 +27,12 @@ class Room extends React.Component {
     roomId: "",
     session: null,
     publisher: null,
+    sharedScreen: {
+      shared: false,
+      screen: null,
+    },
   };
+
   state = {
     ...this.initialState,
   };
@@ -118,6 +123,8 @@ class Room extends React.Component {
         if (event.reason === "networkDisconnected") {
           alert("Your network connection terminated.");
         }
+
+        this.props.closeRoom();
       },
     });
     session.connect(token, (error) => {
@@ -157,6 +164,64 @@ class Room extends React.Component {
     const { session, publisher } = this.state;
     session.unpublish(publisher);
     session.disconnect();
+  };
+
+  shareScreen = () => {
+    const { session, sharedScreen } = this.state;
+
+    if (!sharedScreen.shared) {
+      OT.checkScreenSharingCapability((response) => {
+        if (!response.supported || response.extensionRegistered === false) {
+          // This browser does not support screen sharing.
+        } else if (response.extensionInstalled === false) {
+          // Prompt to install the extension.
+        } else {
+          // Screen sharing is available. Publish the screen.
+          const publisher = OT.initPublisher(
+            "screen-preview",
+            {
+              videoSource: "screen",
+              width: "100%",
+              height: "100%",
+              showControls: false,
+            },
+            (error) => {
+              if (error) {
+                // Look at error.message to see what went wrong.
+              } else {
+                session.publish(publisher, (error) => {
+                  if (error) {
+                    // Look error.message to see what went wrong.
+                    console.log(error);
+                  } else {
+                    this.setState((prevState) => {
+                      return {
+                        ...prevState,
+                        sharedScreen: {
+                          screen: publisher,
+                          shared: true,
+                        },
+                      };
+                    });
+                  }
+                });
+              }
+            }
+          );
+        }
+      });
+    } else {
+      session.unpublish(sharedScreen.screen);
+      this.setState((prevState) => {
+        return {
+          ...prevState,
+          sharedScreen: {
+            screen: null,
+            shared: false,
+          },
+        };
+      });
+    }
   };
 
   toggleAudio = () => {
