@@ -7,7 +7,7 @@ import "./App.css";
 import { connect } from "react-redux";
 
 // thunks
-import { getSessionInfo, getAvailableRooms } from "../store/rooms";
+import { getSessionInfo, getAvailableRooms, deleteRoom } from "../store/rooms";
 
 // components
 import Room from '../components/room';
@@ -16,6 +16,7 @@ class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      rooms: [],
       room: {
         roomId: "",
         opened: false,
@@ -68,11 +69,51 @@ class App extends Component {
     });
   }
 
+  showAvailableRooms = () => {
+    const { rooms } = this.state;
+    const availableRooms = [];
+
+    if (rooms) {
+      rooms.map((room) => {
+        availableRooms.push(
+          <div className="roomButtons" key={room}>
+            <button
+              id={room}
+              key={`${room}j`}
+              onClick={() => this.enterRoom(room)}
+            >
+              Join Room
+            </button>
+            <button
+              key={`${room}d`}
+              onClick={() => this.props.deleteRoom(room)}
+            >
+              Delete Room
+            </button>
+          </div>
+        );
+      });
+    }
+
+    return availableRooms;
+  };
+
+  showsRooms = async () => {
+    await this.props.getAvailableRooms();
+    this.setState((prevState) => {
+      return {
+        ...prevState,
+        showAvailableRooms: true,
+      };
+    });
+  };
+
   renderMainWindow = () => {
     return (
       <div className="MainWindow">
         <button onClick={this.props.getSessionInfo}>Create a room</button>
         <button onClick={this.props.getAvailableRooms}>Rooms</button>
+        <div>{this.state.showAvailableRooms && this.showAvailableRooms()}</div>
       </div>
     );
   };
@@ -97,6 +138,7 @@ export const mapStateToProps = (state) => ({
 export const mapDispatchToProps = (dispatch) => ({
   getSessionInfo: () => dispatch(getSessionInfo()),
   getAvailableRooms: () => dispatch(getAvailableRooms()),
+  deleteRoom: (roomId) => dispatch(deleteRoom(roomId)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);

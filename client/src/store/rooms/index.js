@@ -1,4 +1,4 @@
-import { CREATE_ROOM, JOIN_ROOM, AVAILABLE_ROOMS } from "./types";
+import { CREATE_ROOM, JOIN_ROOM, AVAILABLE_ROOMS, DELETE_ROOM } from "./types";
 import axios from "axios";
 
 const baseURL =
@@ -48,6 +48,20 @@ export const getAvailableRooms = () => (dispatch) => {
     });
 };
 
+export const deleteRoom = (roomId) => (dispatch) => {
+  return axios
+    .delete(`${baseURL}/api/session/${roomId}`)
+    .then((response) => {
+      dispatch({
+        type: DELETE_ROOM,
+        payload: response.data,
+      });
+    })
+    .catch((error) => {
+      return error.response;
+    });
+};
+
 const userInitialState = {
   data: [],
   createdRoom: {
@@ -72,6 +86,7 @@ export const reducer = (state = userInitialState, action) => {
         userToken: action.payload,
       };
     case AVAILABLE_ROOMS:
+    case DELETE_ROOM:
       return {
         ...state,
         availableRooms: action.payload,

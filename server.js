@@ -59,6 +59,16 @@ app.post("/api/token", async (req, res) => {
   res.json({ token });
 });
 
+app.delete("/api/session/:roomId", (req, res) => {
+  const rooms = createdSessions.filter(room => room !== req.params.roomId)
+  createdSessions = [...rooms]
+  res.send({rooms: rooms})
+});
+
+app.get("/api/session", (req, res) => {
+  res.send({rooms: createdSessions});
+});
+
 app.post("/api/session", (req, res) => {
   createSession().then((newSession) => {
     const token = newSession.generateToken();
